@@ -1,0 +1,93 @@
+# Create documents of topics for each stage, by Jupyter
+f = open("topic4.1.txt",encoding = "utf-8")
+doc4_1 = f.readlines()
+print(doc4_1)
+
+f = open("topic4.2.txt",encoding = "utf-8")
+doc4_2 = f.readlines()
+print(doc4_2)
+
+f = open("topic4.3.txt",encoding = "utf-8")
+doc4_3 = f.readlines()
+print(doc4_3)
+
+f = open("topic4.4.txt",encoding = "utf-8")
+doc4_4 = f.readlines()
+print(doc4_4)
+
+f = open("topic5.1.txt",encoding = "utf-8")
+doc5_1 = f.readlines()
+print(doc5_1)
+
+f = open("topic5.2.txt",encoding = "utf-8")
+doc5_2 = f.readlines()
+print(doc5_2)
+
+f = open("topic5.3.txt",encoding = "utf-8")
+doc5_3 = f.readlines()
+print(doc5_3)
+
+f = open("topic5.4.txt",encoding = "utf-8")
+doc5_4 = f.readlines()
+print(doc5_4)
+
+f = open("topic5.5.txt",encoding = "utf-8")
+doc5_5 = f.readlines()
+print(doc5_5)
+
+f = open("topic7.1.txt",encoding = "utf-8")
+doc7_1 = f.readlines()
+print(doc7_1)
+
+f = open("topic7.2.txt",encoding = "utf-8")
+doc7_2 = f.readlines()
+print(doc7_2)
+
+f = open("topic7.3.txt",encoding = "utf-8")
+doc7_3 = f.readlines()
+print(doc7_3)
+
+f = open("topic7.4.txt",encoding = "utf-8")
+doc7_4 = f.readlines()
+print(doc7_4)
+
+f = open("topic7.5.txt",encoding = "utf-8")
+doc7_5 = f.readlines()
+print(doc7_5)
+
+f = open("topic7.6.txt",encoding = "utf-8")
+doc7_6 = f.readlines()
+print(doc7_6)
+
+f = open("topic7.7.txt",encoding = "utf-8")
+doc7_7 = f.readlines()
+print(doc7_7)
+
+#Create text matrix
+#Matrix between Stage 1 and Stage 2
+from sklearn.feature_extraction.text import CountVectorizer
+import pandas as pd
+count_vect = CountVectorizer()
+
+documents = [doc4_1,doc4_2,doc4_3,doc4_4,doc5_1,doc5_2,doc5_3,doc5_4,doc5_5]
+X_train_counts = count_vect.fit_transform(documents)
+df = pd.DataFrame(X_train_counts.toarray(),columns=count_vect.get_feature_names(),index=['doc4_1','doc4_2','doc4_3','doc4_4','doc5_1','doc5_2','doc5_3','doc5_4','doc5_5'])
+df
+
+#Similarity calculation between Stage 1 and Stage 2
+from sklearn.metrics.pairwise import cosine_similarity
+print(cosine_similarity(df, df))
+
+#Matrix betwween Stage 2 and Stage 3
+from sklearn.feature_extraction.text import CountVectorizer
+import pandas as pd
+count_vect = CountVectorizer()
+
+documents = [doc5_1,doc5_2,doc5_3,doc5_4,doc5_5,doc7_1,doc7_2,doc7_3,doc7_4,doc7_5,doc7_6,doc7_7]
+X_train_counts = count_vect.fit_transform(documents)
+df = pd.DataFrame(X_train_counts.toarray(),columns=count_vect.get_feature_names(),index=['doc5_1','doc5_2','doc5_3','doc5_4','doc5_5','doc7_1','doc7_2','doc7_3','doc7_4','doc7_5','doc7_6','doc7_7'])
+df
+
+#Similarity calculation between Stage 2 and Stage 3
+from sklearn.metrics.pairwise import cosine_similarity
+print(cosine_similarity(df, df))
