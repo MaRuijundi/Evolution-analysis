@@ -1,0 +1,82 @@
+library(tm)
+library(SnowballC)
+library(topicmodels)
+setwd("C:\\Myproject_LDA\\DATABASE\\data03_141") 
+filenames <- list.files(getwd(),pattern="*.txt")
+files <- lapply(filenames,readLines,encoding="UTF-8")
+articles.corpus <- VCorpus(VectorSource(files))
+articles.corpus <- tm_map(articles.corpus, content_transformer ( tolower ))
+articles.corpus <- tm_map(articles.corpus, removePunctuation)
+articles.corpus <- tm_map(articles.corpus, removeNumbers);
+articles.corpus <- tm_map(articles.corpus, stripWhitespace);
+stopword <- c(stopwords('english'),"plant","women","cancer","ti","ab","can","one","and","like","just","gonna","know","really","right","going","get","well","lot","actually","new",
+              "will","much","way","and","see","make","look",
+              "also","able","say","back","got","take","great",
+              "many","next","using","around","thing","two",
+              "looking","said","kind","come","put","yeah",
+              "even","still","ago","every","three","five","gonna",
+              "okay","whether","seen","you","six","there","this",
+              "and","but","you","want","thats","but","you",
+              "folks","sure","run","and");
+articles.corpus <- tm_map(articles.corpus, removeWords, stopword)
+articles.corpus <- tm_map(articles.corpus, stemDocument)
+
+#Create document-term matrix
+params <- list(minDocFreq = 1,removeNumbers = TRUE,stopwords = TRUE,stemming = TRUE,weighting = weightTf)
+articleDtm <- DocumentTermMatrix(articles.corpus, control = params);
+# Convert rownames to filenames
+rownames(articleDtm) <- filenames
+# Collapse matrix by summing over columns
+freq <- colSums(as.matrix(articleDtm))
+#Length should be total number of terms
+length(freq)
+# Create sort order (descending)
+ord <- order(freq,decreasing=TRUE)
+# List all terms in decreasing order of freq and write to disk
+#inspect most frequently occurring terms
+freq[head(ord)]
+#inspect least frequently occurring terms
+freq[tail(ord)]
+#total terms
+freq[ord]
+#list most frequent terms. Lower bound specified as second argument
+findFreqTerms(articleDtm,lowfreq = 20)
+write.csv(freq[ord],"word_freq.csv")
+
+#histogram 
+wf= data.frame(term=names(freq),occurrences=freq)
+library(ggplot2)
+p <- ggplot(subset(wf,freq>50),aes(term,occurrences))
+p <- p + geom_bar(stat="identity")
+p <- p + theme(axis.text.x = element_text(angle = 45,hjust = 1))
+p
+
+#LDA model
+# Load topic models library
+library(topicmodels)
+library(quantreg)
+
+set.seed(123)
+m = LDA(articleDtm, method = "Gibbs", k = 4,  control = list(alpha = 0.1))
+m
+
+terms(m,10)
+
+# Top N terms in each topic  
+ldaOut.terms <- as.matrix(terms(m,700))
+write.csv(ldaOut.terms,file=paste("LDAGibbs",k=4,"TopicsToTerms.csv"))
+
+
+#LDA visulization
+library(LDAvis)   
+
+articleDtm = articleDtm[slam::row_sums(articleDtm) > 0, ]
+phi = as.matrix(posterior(m)$terms)
+theta <- as.matrix(posterior(m)$topics)
+vocab <- colnames(phi)
+doc.length = slam::row_sums(articleDtm)
+term.freq = slam::col_sums(articleDtm)[match(vocab, colnames(articleDtm))]
+
+json = createJSON(phi = phi, theta = theta, vocab = vocab,
+                  doc.length = doc.length, term.frequency = term.freq)
+serVis(json)
