@@ -1,7 +1,7 @@
 # Evolution-analysis
 Tracing the evolution of green logistics
 ## Database
-All the data related to the revolution analysis has been uploaded.
+All the article data related to the evolution analysis of green logistics has been uploaded.
 
 ## LDA topic model
 We use R programming to obtain the hot topics in three stages of green logistics development. The code in each phase can be found in the files.
@@ -30,3 +30,7 @@ The Python code is realized in Jupyter notebook of Anaconda3.
 #### Packages in Python
 * pandas
 * sklearn
+
+## License
+The data and code are licensed by MIT license.
+
